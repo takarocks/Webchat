@@ -217,13 +217,9 @@ class Input extends Component {
           }}
           rows={1}
         />
-        
-        <SendButton
-          preferences={preferences}
-          sendMessage={this.sendMessage}
-          value={value}
-        />
-        
+
+        <SendButton preferences={preferences} sendMessage={this.sendMessage} value={value} />
+
         {showLimitCharacter && (
           <div className="characterLimit">{characterLimit - value.length}</div>
         )}

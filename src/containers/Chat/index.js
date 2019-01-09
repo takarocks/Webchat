@@ -21,7 +21,8 @@ import './style.scss'
 
 const MAX_GET_MEMORY_TIME = 10 * 1000 // in ms
 const FAILED_TO_GET_MEMORY = 'Could not get memory from webchatMethods.getMemory :'
-const WRONG_MEMORY_FORMAT = 'Wrong memory format, expecting : { "memory": <json>, "merge": <boolean> }'
+const WRONG_MEMORY_FORMAT =
+  'Wrong memory format, expecting : { "memory": <json>, "merge": <boolean> }'
 
 @connect(
   state => ({
@@ -133,10 +134,15 @@ class Chat extends Component {
     })
   }
 
-  shouldHideBotReply = (responseData) => {
-    return responseData.conversation && responseData.conversation.skill === 'qna'
-    && Array.isArray(responseData.nlp) && !responseData.nlp.length
-    && Array.isArray(responseData.messages) && !responseData.messages.length;
+  shouldHideBotReply = responseData => {
+    return (
+      responseData.conversation &&
+      responseData.conversation.skill === 'qna' &&
+      Array.isArray(responseData.nlp) &&
+      !responseData.nlp.length &&
+      Array.isArray(responseData.messages) &&
+      !responseData.messages.length
+    )
   }
 
   sendMessage = (attachment, userMessage) => {
@@ -161,13 +167,16 @@ class Chat extends Component {
     }
 
     if (userMessage)
-      userMessage = {...JSON.parse(JSON.stringify(backendMessage)), attachment: { type: 'text', content: userMessage}};
+      userMessage = {
+        ...JSON.parse(JSON.stringify(backendMessage)),
+        attachment: { type: 'text', content: userMessage },
+      }
 
     this.setState(
       prevState => ({ messages: _concat(prevState.messages, [backendMessage]) }),
       () => {
         if (sendMessagePromise) {
-          addUserMessage(userMessage || backendMessage);
+          addUserMessage(userMessage || backendMessage)
 
           sendMessagePromise(backendMessage)
             .then(res => {
@@ -187,7 +196,7 @@ class Chat extends Component {
         } else {
           // get potential memoryOptions from website developer
           this.getMemoryOptions(chatId)
-            .then((memoryOptions) => {
+            .then(memoryOptions => {
               if (memoryOptions) {
                 payload.memoryOptions = memoryOptions
               }
@@ -261,6 +270,10 @@ class Chat extends Component {
   }
 
   render() {
+    /** TEST
+    console.log (document.cookie)
+    /yacceleratorstorefront/electronics/en/my-account/update-email
+    */
     const {
       closeWebchat,
       preferences,
@@ -323,7 +336,7 @@ class Chat extends Component {
                     'RecastAppChat--slogan--hidden': !showSlogan,
                   })}
                 >
-                  {'We run with Recast.AI'}
+                  {'Powered by SAP Conversational AI'}
                 </div>,
               ]}
         </div>
@@ -362,6 +375,28 @@ Chat.propTypes = {
   containerStyle: PropTypes.object,
   show: PropTypes.bool,
   enableHistoryInput: PropTypes.bool,
+}
+
+// Set userName and userUid every time page is loaded
+window.onload = function() {
+  var webchatUserName = document.getElementById("webchatUserName").textContent
+  var webchatUserId = document.getElementById("webchatUserId").textContent
+
+  if (webchatUserName.toLowerCase().trim() === "anonymous") {
+    webchatUserName = ""
+  }
+  if (webchatUserId.toLowerCase().trim() === "anonymous") {
+    webchatUserId = ""
+  }
+  // debug
+  console.log("webchatUserName:" + webchatUserName +"/webchatUserId:" + webchatUserId)
+
+  window.webchatMethods = {
+    getMemory: (conversationId) => {
+      const memory = { userName: webchatUserName, userId: webchatUserId}
+      return { memory, merge: true }
+    }
+  }
 }
 
 export default Chat
