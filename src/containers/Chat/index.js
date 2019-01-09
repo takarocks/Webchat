@@ -379,8 +379,8 @@ Chat.propTypes = {
 
 // Set userName and userUid every time page is loaded
 window.onload = function() {
-  var webchatUserName = document.getElementById("webchatUserName").textContent
-  var webchatUserId = document.getElementById("webchatUserId").textContent
+  var webchatUserName = document.getElementById("webchatUserName").getAttribute("value")
+  var webchatUserId = document.getElementById("webchatUserId").getAttribute("value")
 
   if (webchatUserName.toLowerCase().trim() === "anonymous") {
     webchatUserName = ""
