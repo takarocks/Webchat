@@ -379,16 +379,42 @@ Chat.propTypes = {
 
 // Set userName and userUid every time page is loaded
 window.onload = function() {
-  var webchatUserName = document.getElementById('webchatUserName').getAttribute('value')
-  var webchatUserId = document.getElementById('webchatUserId').getAttribute('value')
-  var webchatUserUnitUid = document.getElementById('webchatUserUnitUid').getAttribute('value')
+  var mem = {}
 
-  if (webchatUserName.toLowerCase().trim() === 'anonymous') {
-    webchatUserName = ''
+  var webchatUserName=''
+  var webchatUserNameElem = document.getElementById('webchatUserName')
+  if(webchatUserNameElem) {
+    webchatUserName=webchatUserNameElem.getAttribute('value')
+    if (webchatUserName.toLowerCase().trim() === 'anonymous') {
+      webchatUserName = ''
+    }
   }
-  if (webchatUserId.toLowerCase().trim() === 'anonymous') {
-    webchatUserId = ''
+  if(webchatUserName != '') {
+    mem['userName'] = webchatUserName
   }
+
+  var webchatUserId=''
+  var webchatUserIdElem = document.getElementById('webchatUserId')
+  if(webchatUserIdElem) {
+    webchatUserId=webchatUserIdElem.getAttribute('value')
+    if (webchatUserId.toLowerCase().trim() === 'anonymous') {
+      webchatUserId = ''
+    }
+  }
+  if(webchatUserId != '') {
+    mem['userId'] = webchatUserId
+    mem['identifierToken'] = webchatUserId
+  }
+
+  var webchatUserUnitUid=''
+  var webchatUserUnitUidElem = document.getElementById('webchatUserUnitUid')
+  if(webchatUserUnitUidElem) {
+    webchatUserUnitUid=webchatUserUnitUidElem.getAttribute('value')
+  }
+  if(webchatUserUnitUid != '') {
+    mem['userUnitId'] = webchatUserUnitUid
+  }
+
   // debug
   console.log(
     'webchatUserName:' +
@@ -401,12 +427,7 @@ window.onload = function() {
 
   window.webchatMethods = {
     getMemory: conversationId => {
-      const memory = {
-        userName: webchatUserName,
-        userId: webchatUserId,
-        userUnitId: webchatUserUnitUid,
-        identifierToken: webchatUserId,
-      }
+      const memory = mem
       return { memory, merge: true }
     },
   }
