@@ -379,23 +379,36 @@ Chat.propTypes = {
 
 // Set userName and userUid every time page is loaded
 window.onload = function() {
-  var webchatUserName = document.getElementById("webchatUserName").getAttribute("value")
-  var webchatUserId = document.getElementById("webchatUserId").getAttribute("value")
+  var webchatUserName = document.getElementById('webchatUserName').getAttribute('value')
+  var webchatUserId = document.getElementById('webchatUserId').getAttribute('value')
+  var webchatUserUnitUid = document.getElementById('webchatUserUnitUid').getAttribute('value')
 
-  if (webchatUserName.toLowerCase().trim() === "anonymous") {
-    webchatUserName = ""
+  if (webchatUserName.toLowerCase().trim() === 'anonymous') {
+    webchatUserName = ''
   }
-  if (webchatUserId.toLowerCase().trim() === "anonymous") {
-    webchatUserId = ""
+  if (webchatUserId.toLowerCase().trim() === 'anonymous') {
+    webchatUserId = ''
   }
   // debug
-  console.log("webchatUserName:" + webchatUserName +"/webchatUserId:" + webchatUserId)
+  console.log(
+    'webchatUserName:' +
+      webchatUserName +
+      '/webchatUserId:' +
+      webchatUserId +
+      '/webchatUserUnitUid:' +
+      webchatUserUnitUid,
+  )
 
   window.webchatMethods = {
-    getMemory: (conversationId) => {
-      const memory = { userName: webchatUserName, userId: webchatUserId}
+    getMemory: conversationId => {
+      const memory = {
+        userName: webchatUserName,
+        userId: webchatUserId,
+        userUnitId: webchatUserUnitUid,
+        identifierToken: webchatUserId,
+      }
       return { memory, merge: true }
-    }
+    },
   }
 }
 
