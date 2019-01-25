@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import './style.scss'
 
-const Header = ({ closeWebchat, preferences, logoStyle }) => (
+const Header = ({ closeWebchat, preferences, logoStyle, clearMessages }) => (
   <div
     className="RecastAppHeader"
     style={{
@@ -15,6 +15,8 @@ const Header = ({ closeWebchat, preferences, logoStyle }) => (
 
     <div className="RecastAppHeader--title">{preferences.headerTitle}</div>
 
+    <div className="RecastAppHeader--action" onClick={clearMessages}>Clear</div>
+
     <div className="RecastAppHeader--btn" onClick={closeWebchat}>
       <img src="https://cdn.recast.ai/webchat/close.svg" />
     </div>
@@ -25,6 +27,7 @@ Header.propTypes = {
   closeWebchat: PropTypes.func,
   preferences: PropTypes.object,
   logoStyle: PropTypes.object,
+  clearMessages: PropTypes.func,
 }
 
 export default Header

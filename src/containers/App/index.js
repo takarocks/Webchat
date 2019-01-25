@@ -171,6 +171,7 @@ class App extends Component {
           secondaryContent={secondaryContent}
           getLastMessage={getLastMessage}
           enableHistoryInput={enableHistoryInput}
+          clearMessages={this.clearMessages}
         />
       </div>
     )

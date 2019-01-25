@@ -270,10 +270,6 @@ class Chat extends Component {
   }
 
   render() {
-    /** TEST
-    console.log (document.cookie)
-    /yacceleratorstorefront/electronics/en/my-account/update-email
-    */
     const {
       closeWebchat,
       preferences,
@@ -288,6 +284,7 @@ class Chat extends Component {
       logoStyle,
       show,
       enableHistoryInput,
+      clearMessages,
     } = this.props
     const { showSlogan, messages, inputHeight } = this.state
 
@@ -306,6 +303,7 @@ class Chat extends Component {
             preferences={preferences}
             key="header"
             logoStyle={logoStyle}
+            clearMessages={clearMessages}
           />
         )}
         <div
@@ -375,62 +373,7 @@ Chat.propTypes = {
   containerStyle: PropTypes.object,
   show: PropTypes.bool,
   enableHistoryInput: PropTypes.bool,
-}
-
-// Set userName and userUid every time page is loaded
-window.onload = function() {
-  var mem = {}
-
-  var webchatUserName=''
-  var webchatUserNameElem = document.getElementById('webchatUserName')
-  if(webchatUserNameElem) {
-    webchatUserName=webchatUserNameElem.getAttribute('value')
-    if (webchatUserName.toLowerCase().trim() === 'anonymous') {
-      webchatUserName = ''
-    }
-  }
-  if(webchatUserName != '') {
-    mem['userName'] = webchatUserName
-  }
-
-  var webchatUserId=''
-  var webchatUserIdElem = document.getElementById('webchatUserId')
-  if(webchatUserIdElem) {
-    webchatUserId=webchatUserIdElem.getAttribute('value')
-    if (webchatUserId.toLowerCase().trim() === 'anonymous') {
-      webchatUserId = ''
-    }
-  }
-  if(webchatUserId != '') {
-    mem['userId'] = webchatUserId
-    mem['identifierToken'] = webchatUserId
-  }
-
-  var webchatUserUnitUid=''
-  var webchatUserUnitUidElem = document.getElementById('webchatUserUnitUid')
-  if(webchatUserUnitUidElem) {
-    webchatUserUnitUid=webchatUserUnitUidElem.getAttribute('value')
-  }
-  if(webchatUserUnitUid != '') {
-    mem['userUnitId'] = webchatUserUnitUid
-  }
-
-  // debug
-  console.log(
-    'webchatUserName:' +
-      webchatUserName +
-      '/webchatUserId:' +
-      webchatUserId +
-      '/webchatUserUnitUid:' +
-      webchatUserUnitUid,
-  )
-
-  window.webchatMethods = {
-    getMemory: conversationId => {
-      const memory = mem
-      return { memory, merge: true }
-    },
-  }
+  clearMessages: PropTypes.func,
 }
 
 export default Chat

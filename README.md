@@ -24,6 +24,15 @@ This webchat is built using the [React](https://github.com/facebook/react) libra
 This webchat is supported by all mobile and desktop browsers in their latest versions.
 Internet Explorer support starts at version 9.0.
 
+## Branch version
+
+### takafreak/cxcommercecustom
+This branch version has enhancement primarily designed for SAP Commerce use case, along with recastwebchataddon addon extension, as well as small generic functionalities.
+
+<div align="center">
+  <img src="assets/webchat-w-clear-action.png" />
+</div>
+
 ## Usage
 
 Three different installations on the webchat module are possible.
