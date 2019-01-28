@@ -13,6 +13,12 @@ export const getMessages = createAction('API:GET_MESSAGES', (channelId, token, c
   headers: { Authorization: token },
 }))
 
+export const getTranscript = createAction('API:GET_TRANSCRIPT', (channelId, token, conversationId) => ({
+  url: `/webhook/${channelId}/conversations/${conversationId}/messages`,
+  method: 'get',
+  headers: { Authorization: token },
+}))
+
 export const pollMessages = createAction(
   'API:POLL_MESSAGES',
   (channelId, token, conversationId, lastMessageId) => ({
