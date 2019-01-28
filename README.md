@@ -30,7 +30,7 @@ Internet Explorer support starts at version 9.0.
 This branch version has enhancement primarily designed for SAP Commerce use case, along with recastwebchataddon addon extension, as well as small generic functionalities.
 
 <div align="center">
-  <img src="assets/webchat-w-clear-action.png" />
+  <img src="assets/webchat-w-transcript-clear.png" />
 </div>
 
 ## Usage
