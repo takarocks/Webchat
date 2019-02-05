@@ -10,6 +10,10 @@ const Button = ({ button, sendMessage }) => {
   const { value, title } = button
   const formattedTitle = truncate(title, 20)
 
+  if (button.type === 'web_url_blank' && sanitizeUrl(value) === 'about:blank') {
+    return null
+  }
+
   if (button.type === 'web_url' && sanitizeUrl(value) === 'about:blank') {
     return null
   }
@@ -17,9 +21,16 @@ const Button = ({ button, sendMessage }) => {
   let content = null
 
   switch (button.type) {
-    case 'web_url':
+    case 'web_url_blank':
       content = (
         <a className="RecastAppButton-Link" href={value} target="_blank">
+          {formattedTitle}
+        </a>
+      )
+      break
+    case 'web_url':
+      content = (
+        <a className="RecastAppButton-Link" href={value} target="_self">
           {formattedTitle}
         </a>
       )
