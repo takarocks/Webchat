@@ -14,6 +14,10 @@ const Button = ({ button, sendMessage }) => {
     return null
   }
 
+  if (button.type === 'web_url_self' && sanitizeUrl(value) === 'about:blank') {
+    return null
+  }
+
   let content = null
 
   switch (button.type) {
@@ -21,6 +25,15 @@ const Button = ({ button, sendMessage }) => {
     content = (
       <a
         className='RecastAppButton-Link CaiAppButton-Link' href={value} target='_blank'
+        rel='noopener noreferrer'>
+        {formattedTitle}
+      </a>
+    )
+    break
+  case 'web_url_self':
+    content = (
+      <a
+        className='RecastAppButton-Link CaiAppButton-Link' href={value} target='_self'
         rel='noopener noreferrer'>
         {formattedTitle}
       </a>
