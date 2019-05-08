@@ -2,6 +2,18 @@
   <img src="assets/header.png" />
 </div>
 
+# SAP Conversational AI Webchat - CUSTOM
+
+## What are the customizations added on this forked branch?
+
+* web_url_self button.type to open web link window on the same browser window
+* Transcript download action on Webchat header
+
+<div align="center">
+  <img src="assets/webchat-w-transcript.png" />
+</div>
+
+
 # SAP Conversational AI Webchat
 | [Default Usage](#usage) | [Self-Hosted Installation](#self-hosted-webchat) | [Getting Started on SAP Conversational AI]( #getting-started-with-sap-conversational-ai) | [License](#license) |
 |---|---|---|---|
