@@ -6,7 +6,7 @@
 
 ## What are the customizations added on this forked branch?
 
-* web_url_self button.type to open web link window on the same browser window
+* **web_url_self** button.type to open web link window on the **same** browser window
 * Transcript download action on Webchat header
 
 <div align="center">
