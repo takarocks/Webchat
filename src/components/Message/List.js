@@ -8,8 +8,8 @@ import Button from 'components/Button'
 
 const ListElement = ({ title, subtitle, imageUrl, buttons, sendMessage }) => {
   const button = buttons[0]
-  const titleMaxLength = 25
-  const subTitleMaxLength = 50
+  const titleMaxLength = 100
+  const subTitleMaxLength = 300
   const buttonTitleMaxLength = 20
 
   return (
