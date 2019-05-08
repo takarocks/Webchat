@@ -20,6 +20,15 @@
     width: 15px;
     height: 15px;
   }
+
+  &--action {
+    cursor: pointer;
+    padding: 3px 5px;
+    border: solid 1px;
+    border-radius: 5px;
+    margin-left: 3px;
+    font-size: 0.8em;
+  }
 }
 
 @media only screen and (min-width: 420px) and (min-height: 575px) {
