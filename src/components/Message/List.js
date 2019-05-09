@@ -24,7 +24,18 @@ const ListElement = ({ title, subtitle, imageUrl, buttons, sendMessage }) => {
         <p className='RecastAppListElement--subtitle CaiAppListElement--subtitle'>{truncate(subtitle, subTitleMaxLength)}</p>
 
         {button
-          && (button.type === 'web_url' ? (
+          && (button.type === 'web_url' || button.type === 'web_url_self' ? (
+            sanitizeUrl(button.value) !== 'about:blank' && (
+              <a
+                href={button.value}
+                className='RecastAppListElement--button CaiAppListElement--button'
+                target='_self'
+                rel='noopener noreferrer'
+              >
+                {truncate(button.title, buttonTitleMaxLength)}
+              </a>
+            )
+          ) : button.type === 'web_url_blank' ? (
             sanitizeUrl(button.value) !== 'about:blank' && (
               <a
                 href={button.value}

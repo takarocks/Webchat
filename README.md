@@ -6,8 +6,12 @@
 
 ## What are the customizations added on this forked branch?
 
-* **web_url_self** button.type to open web link window on the **same** browser window
-* Transcript download action on Webchat header
+* **web_url** button.type behavior changed to open web link window on the **same** browser window.
+* **web_url_self** button.type is introduced which works as same as **web_url**.
+* **web_url_blank** button.type is introduced to open web link window on the **new** browser window, original **web_url** behavior.
+* All button.type behaves the same as above including **List** message.
+* Transcript download action on Webchat header.
+* **List** message type text max length extended. Title 25 to 100, Subtitle 50 to 300.
 
 <div align="center">
   <img src="assets/webchat-w-transcript.png" />
