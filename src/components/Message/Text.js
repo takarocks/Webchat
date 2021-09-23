@@ -2,17 +2,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import sanitizeHtml from 'sanitize-html-react'
 import ReactMarkdown from 'react-markdown'
+import gfm from 'remark-gfm'
 
-import { truncate } from 'helpers'
+import cx from 'classnames'
+
+import { truncate, safeStringValue } from 'helpers'
 
 import './style.scss'
 
 const allowedMarkdownTypes = [
   'paragraph',
   'text',
+  'break',
   'emphasis',
   'strong',
   'link',
+  'image',
   'blockquote',
   'delete',
   'list',
@@ -27,23 +32,21 @@ const allowedMarkdownTypes = [
   'tableCell',
 ]
 
-const Text = ({ content, style, isMarkdown }) => {
-  let respond
+// Export for unit test
+export const getValidMarkDownLinkString = (isMarkdown, compiledResponse) => {
+  if (isMarkdown && compiledResponse) {
+  // Search the text starting with [ with :// and ends with ]
+    return compiledResponse
+  }
+
+  return null
+}
+
+const Text = ({ content, style, isMarkdown, readOnlyMode }) => {
+  const respond = safeStringValue(content)
 
   if (typeof isMarkdown !== 'boolean') {
     isMarkdown = false
-  }
-
-  if (typeof content === 'string') {
-    respond = content
-  } else if (typeof content === 'object') {
-    respond = JSON.stringify(content)
-  } else if (typeof content === 'number') {
-    respond = content.toString()
-  } else if (content === undefined) {
-    respond = 'undefined'
-  } else {
-    respond = ''
   }
 
   let maxLengthLimit = 640
@@ -65,17 +68,24 @@ const Text = ({ content, style, isMarkdown }) => {
   // Markdown links need to open in new window.
   // BCP: https://support.wdf.sap.corp/sap/support/message/1980408289
   const LinkRenderer = (props) => {
-    return <a href={props.href} target='_blank' rel='noopener noreferrer'>{props.children}</a>
+    return (
+      <a
+        className={cx({ 'CaiAppButton--ReadOnly': readOnlyMode })}
+        href={readOnlyMode ? '#' : props.href}
+        target={readOnlyMode ? '_self' : '_blank'}
+        rel='noopener noreferrer'>{props.children}
+      </a>)
   }
+  const markDownResponse = getValidMarkDownLinkString(isMarkdown, compiledResponse)
 
   return (
     <div style={style} className={'RecastAppText CaiAppText'}>
       {isMarkdown ? (
         <ReactMarkdown
-          source={compiledResponse}
+          plugins={[gfm]}
           renderers={{ link: LinkRenderer }}
-          allowedTypes={allowedMarkdownTypes}
-        />
+          allowedTypes={allowedMarkdownTypes}>{markDownResponse}
+        </ReactMarkdown>
       ) : (
         compiledResponse
       )}
@@ -87,6 +97,7 @@ Text.propTypes = {
   style: PropTypes.object,
   content: PropTypes.string,
   isMarkdown: PropTypes.bool,
+  readOnlyMode: PropTypes.bool,
 }
 
 export default Text

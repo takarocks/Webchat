@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 import append from 'ramda/es/append'
 
 import SendButton from 'components/SendButton'
+import { safeArrayOfItem } from 'helpers'
 
 import Menu from 'components/Menu'
 import MenuSVG from 'components/svgs/menu'
 import './style.scss'
+import { pathOr } from 'ramda'
 
 // Number of minimum char to display the char limit.
 const NUMBER_BEFORE_LIMIT = 5
@@ -18,11 +20,22 @@ class Input extends Component {
     historyValues: [],
     indexHistory: 0,
     menuOpened: false,
+    isOpen: false,
+    hasFocus: false,
     menuIndexes: [],
   }
 
+  static getDerivedStateFromProps (props, state) {
+    if (!props.isOpen) {
+      return { isOpen: props.isOpen, hasFocus: false }
+    }
+    return { isOpen: props.isOpen }
+  }
+
   componentDidMount () {
-    this._input.focus()
+    if (this.state.isOpen) {
+      this.setFocusState()
+    }
     this._input.value = ''
 
     this.onInputHeight()
@@ -33,20 +46,37 @@ class Input extends Component {
       nextState.value !== this.state.value
       || nextState.menuOpened !== this.state.menuOpened
       || nextState.menuIndexes.length !== this.state.menuIndexes.length
+      || nextState.isOpen !== this.state.isOpen
     )
   }
 
   componentDidUpdate () {
+    if (this.state.isOpen) {
+      this.setFocusState()
+    }
     if (!this.state.value) {
       // Dirty fix textarea placeholder to reset style correctly
       setTimeout(() => {
-        this._input.style.height = '18px'
-        this._input.value = ''
+        if (this._input) {
+          this._input.style.height = '18px'
+          this._input.value = ''
+        }
         this.onInputHeight()
       }, 100)
     }
 
     this.onInputHeight()
+  }
+
+  setFocusState () {
+    if (!this.state.hasFocus && this._input) {
+      setTimeout(() => {
+        if (this._input) {
+          this._input.focus()
+        }
+        this.setState({ hasFocus: true })
+      }, 100)
+    }
   }
 
   onInputChange = e => {
@@ -75,14 +105,19 @@ class Input extends Component {
       onInputHeight(this.inputContainer.clientHeight)
     }
   }
-
+  sendMenuSelection = (action) => {
+    if (action) {
+      const title = pathOr(null, ['content', 'title'], action)
+      this.props.onSubmit(action, title)
+    }
+  }
   sendMessage = () => {
     const content = this.state.value.trim()
     if (content) {
       this.props.onSubmit({
         type: 'text',
         content,
-      })
+      }, content.title)
       this.setState(prevState => {
         const historyValues = append(content, prevState.historyValues)
         const previousValues = append('', historyValues)
@@ -117,8 +152,10 @@ class Input extends Component {
           () => {
             // Trick to go to the end of the line when pressing ArrowUp key
             setTimeout(() => {
-              this._input.selectionStart = this._input.value.length
-              this._input.selectionEnd = this._input.value.length
+              if (this._input) {
+                this._input.selectionStart = this._input.value.length
+                this._input.selectionEnd = this._input.value.length
+              }
             }, 10)
           },
         )
@@ -170,6 +207,9 @@ class Input extends Component {
   render () {
     const { enableHistoryInput, characterLimit, menu, preferences, inputPlaceholder } = this.props
     const { value, menuOpened } = this.state
+    const { call_to_actions } = menu || []
+    const menuActions = safeArrayOfItem(call_to_actions)
+    const showMenuIcon = menuActions.length > 0
 
     const showLimitCharacter = characterLimit
       ? characterLimit - value.length <= NUMBER_BEFORE_LIMIT
@@ -182,7 +222,7 @@ class Input extends Component {
           this.inputContainer = ref
         }}
       >
-        {menu && <MenuSVG onClick={this.triggerMenu} />}
+        {showMenuIcon && <MenuSVG onClick={this.triggerMenu} />}
 
         {menuOpened && (
           <Menu
@@ -190,7 +230,7 @@ class Input extends Component {
             currentMenu={this.getCurrentMenu()}
             addMenuIndex={this.addMenuIndex}
             removeMenuIndex={this.removeMenuIndex}
-            postbackClick={value => this.setState({ value }, this.sendMessage)}
+            postbackClick={action => this.sendMenuSelection(action)}
           />
         )}
 
@@ -233,6 +273,7 @@ class Input extends Component {
 }
 
 Input.propTypes = {
+  isOpen: PropTypes.bool,
   menu: PropTypes.object,
   onSubmit: PropTypes.func,
   onInputHeight: PropTypes.func,

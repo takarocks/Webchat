@@ -80,9 +80,16 @@ class Live extends Component {
       containerMessagesStyle,
       showInfo,
       onClickShowInfo,
+      readOnlyMode,
     } = this.props
     const { showTyping } = this.state
     const lastMessage = messages.slice(-1)[0]
+    const isBot = pathOr(false, ['participant', 'isBot'], lastMessage)
+    const delayVal = pathOr(5, ['attachment', 'delay'], lastMessage)
+    // add 2 seconds to the delay to allow for api lag.
+    // See https://sapjira.wdf.sap.corp/browse/SAPMLCONV-13428 for requirements
+    const maxDelay = ((typeof delayVal === 'string' ? parseFloat(delayVal) : delayVal) + 2) * 1000
+    const timeoutAmount = isBot ? maxDelay : 20000
 
     const sendMessagePromiseCondition
       = lastMessage
@@ -94,7 +101,6 @@ class Live extends Component {
       lastMessage
       && (sendMessagePromiseCondition || pollMessageCondition)
       && !lastMessage.retry
-      && !lastMessage.isSending
       && showTyping
     )
 
@@ -121,14 +127,16 @@ class Live extends Component {
               showInfo={showInfo}
               onClickShowInfo={onClickShowInfo}
               error={message.error}
+              readOnlyMode={readOnlyMode}
             />
           ))}
 
           {shouldDisplayTyping && (
             <IsTyping
+              onImageLoaded={this.onImageLoaded}
               image={preferences.botPicture}
               callAfterTimeout={() => this.setState({ showTyping: false })}
-              timeout={20000}
+              timeout={timeoutAmount}
             />
           )}
         </div>
@@ -144,6 +152,7 @@ Live.propTypes = {
   onRetrySendMessage: PropTypes.func,
   onCancelSendMessage: PropTypes.func,
   showInfo: PropTypes.bool,
+  readOnlyMode: PropTypes.bool,
 }
 
 export default Live

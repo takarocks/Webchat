@@ -2,16 +2,23 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { sanitizeUrl } from '@braintree/sanitize-url'
 
-import { truncate } from 'helpers'
+import { truncate, safeArrayOfItem } from 'helpers'
 
 import Button from 'components/Button'
+import { propOr } from 'ramda'
 
-const Card = ({ content, sendMessage, onImageLoaded }) => {
-  const { title, subtitle, imageUrl, buttons } = content
+const Card = ({ content, sendMessage, onImageLoaded, readOnlyMode, isLastMessage }) => {
+  const title = propOr('', 'title', content)
+  const subtitle = propOr(null, 'subtitle', content)
+  const buttons = propOr(null, 'buttons', content)
+  let imageUrl = propOr(null, 'imageUrl', content)
 
   if (imageUrl && sanitizeUrl(imageUrl) === 'about:blank') {
-    return null
+    console.warn('Warning the image url is not supported')
+    // If the image is invalid still show the card without the image
+    imageUrl = null
   }
+
   // https://sapjira.wdf.sap.corp/browse/SAPMLCONV-6296
   // Need to check if buttons is null before rendering the button html.
   return (
@@ -25,8 +32,13 @@ const Card = ({ content, sendMessage, onImageLoaded }) => {
 
       {buttons && buttons.length ? (
         <div className='RecastAppCard--button-container CaiAppCard--button-container'>
-          {buttons.slice(0, 3).map((b, i) => (
-            <Button key={i} button={b} sendMessage={sendMessage} />
+          {safeArrayOfItem(buttons).slice(0, 3).map((b, i) => (
+            <Button
+              key={i}
+              button={b}
+              sendMessage={sendMessage}
+              isLastMessage={isLastMessage}
+              readOnlyMode={readOnlyMode} />
           ))}
         </div>
       ) : null}
@@ -35,9 +47,11 @@ const Card = ({ content, sendMessage, onImageLoaded }) => {
 }
 
 Card.propTypes = {
+  isLastMessage: PropTypes.bool,
   content: PropTypes.object,
   sendMessage: PropTypes.func,
   onImageLoaded: PropTypes.func,
+  readOnlyMode: PropTypes.bool,
 }
 
 export default Card

@@ -1,17 +1,39 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { sanitizeUrl } from '@braintree/sanitize-url'
+import cx from 'classnames'
 
-import { truncate } from 'helpers'
+import { truncate, validButtonContent } from 'helpers'
 
 import './style.scss'
 
-const Button = ({ button, sendMessage }) => {
-  const { value, title } = button
+const _getValidTelHref = (button, readOnlyMode) => {
+  const { value } = button
+  if (!readOnlyMode && value) {
+    return value.indexOf('tel:') === 0 ? value : `tel:${value}`
+  }
+  return '#'
+}
+
+const _getUrlInfo = (button, readOnlyMode) => {
+  const { value } = button
+  const target = readOnlyMode ? '_self' : '_blank'
+  const href = readOnlyMode || !value ? '#' : value
+  return {
+    target,
+    href,
+  }
+}
+
+const Button = ({ button, sendMessage, readOnlyMode, isLastMessage }) => {
+  if (!button) {
+    return null
+  }
+  const { value, title, type } = button
   // Increase Button length to 80 characters per SAPMLCONV-3486
   const formattedTitle = truncate(title, 80)
   const tooltip = title && title.length > 80 ? title : null
-
+  const disableButton = readOnlyMode || (!isLastMessage && type === 'trigger_skill')
   if (button.type === 'web_url' && sanitizeUrl(value) === 'about:blank') {
     return null
   }
@@ -26,13 +48,16 @@ const Button = ({ button, sendMessage }) => {
 
   let content = null
 
-  // https://sapjira.wdf.sap.corp/browse/SAPMLCONV-4781 - Support the pnonenumber options
-  const telHref = value && value.indexOf('tel:') === 0 ? value : `tel:${value}`
-  switch (button.type) {
+  // https://sapjira.wdf.sap.corp/browse/SAPMLCONV-4781 - Support the phonenumber options
+  const linkClassName = cx('RecastAppButton-Link CaiAppButton-Link', { 'CaiAppButton--ReadOnly': disableButton })
+  const { href, target } = _getUrlInfo(button, disableButton)
+  const bData = validButtonContent(button)
+  switch (type) {
   case 'phonenumber':
     content = (
       <a
-        className='RecastAppButton-Link CaiAppButton-Link' href={telHref}>
+        className={linkClassName}
+        href={_getValidTelHref(button, disableButton)}>
         {formattedTitle}
       </a>
     )
@@ -40,7 +65,9 @@ const Button = ({ button, sendMessage }) => {
   case 'web_url_blank':
     content = (
       <a
-        className='RecastAppButton-Link CaiAppButton-Link' href={value} target='_blank'
+        className={linkClassName}
+        href={href}
+        target={target}
         rel='noopener noreferrer'>
         {formattedTitle}
       </a>
@@ -60,8 +87,11 @@ const Button = ({ button, sendMessage }) => {
     content = (
       <div
         title={tooltip}
-        className='RecastAppButton CaiAppButton'
-        onClick={() => sendMessage({ type: 'button', content: button }, title)}
+        className={cx('RecastAppButton CaiAppButton', { 'CaiAppButton--ReadOnly': disableButton })}
+        onClick={() => {
+          // eslint-disable-next-line no-unused-expressions
+          !disableButton && sendMessage({ type: 'button', content: bData }, title)
+        }}
       >
         {formattedTitle}
       </div>
@@ -73,8 +103,10 @@ const Button = ({ button, sendMessage }) => {
 }
 
 Button.propTypes = {
+  isLastMessage: PropTypes.bool,
   button: PropTypes.object,
   sendMessage: PropTypes.func,
+  readOnlyMode: PropTypes.bool,
 }
 
 export default Button

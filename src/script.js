@@ -1,4 +1,6 @@
+import 'core-js/stable'
 import 'regenerator-runtime/runtime'
+import 'react-app-polyfill/ie11'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -23,11 +25,16 @@ const script = document.currentScript || document.getElementById('cai-webchat')
 const channelId = script.getAttribute('channelId')
 const token = script.getAttribute('token')
 
+const readOnly = false
 if (root && channelId && token) {
   getChannelPreferences(channelId, token).then(preferences => {
     ReactDOM.render(
       <Provider store={store}>
-        <App token={token} channelId={channelId} preferences={preferences} />
+        <App
+          token={token}
+          channelId={channelId}
+          preferences={preferences}
+          readOnlyMode={readOnly} />
       </Provider>,
       root,
     )

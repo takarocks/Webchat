@@ -10,6 +10,7 @@ module.exports = {
   resolve: {
     modules: ['../src', '../node_modules'].map(p => path.resolve(__dirname, p)),
   },
+  devtool: env === 'production' ? 'none' : 'eval-source-map',
   output: {
     path: path.join(__dirname, '../lib'),
     filename: 'index.js',
@@ -23,8 +24,10 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node-modules/,
+        exclude: [/(node-modules|resources|core-js)/],
         options: {
+          presets: ['@babel/preset-env', '@babel/preset-react'],
+          babelrc: true,
           cacheDirectory: true,
         },
       },

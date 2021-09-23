@@ -6,7 +6,7 @@ import Chat from 'containers/Chat'
 import Expander from 'components/Expander'
 import { setFirstMessage, removeAllMessages } from 'actions/messages'
 import { setCredentials, createConversation } from 'actions/conversation'
-import { storeCredentialsToLocalStorage, getCredentialsFromLocalStorage } from 'helpers'
+import { getCredentialsFromLocalStorage } from 'helpers'
 
 import './style.scss'
 
@@ -24,14 +24,19 @@ const NO_LOCALSTORAGE_MESSAGE
   removeAllMessages,
   },
 )
+
 class App extends Component {
   state = {
     expanded: this.props.expanded || false,
     isReady: null,
   }
   static getDerivedStateFromProps (props, state) {
-    const { isReady, preferences, expanded } = props
-    if (isReady !== state.isReady) {
+    const { isReady, preferences } = props
+
+    // Since the conversation is only created after the first submit
+    // need to check if the current state is expanded to avoid webchat being collasped
+    // when the conversation is created.
+    if (isReady !== state.isReady && !state.expanded) {
       let expanded = null
 
       switch (preferences.openingType) {
@@ -42,7 +47,7 @@ class App extends Component {
         expanded = false
         break
       case 'memory':
-        if (typeof window.localStorage !== 'undefined') {
+        if (window.localStorage) {
           expanded = localStorage.getItem('isChatOpen') === 'true'
         } else {
           console.log(NO_LOCALSTORAGE_MESSAGE)
@@ -53,7 +58,7 @@ class App extends Component {
       }
       return { expanded, isReady }
     }
-    return null
+    return { isReady }
   }
 
   componentDidMount () {
@@ -72,9 +77,10 @@ class App extends Component {
     if (credentials) {
       Object.assign(payload, credentials)
     } else {
-      this.props.createConversation(channelId, token).then(({ id, chatId }) => {
-        storeCredentialsToLocalStorage(chatId, id, preferences.conversationTimeToLive, channelId)
-      })
+      // Wait until a message is being send before creating the conversation.
+      // this.props.createConversation(channelId, token).then(({ id, chatId }) => {
+      //   storeCredentialsToLocalStorage(chatId, id, preferences.conversationTimeToLive, channelId)
+      // })
     }
 
     if (preferences.welcomeMessage) {
@@ -84,11 +90,11 @@ class App extends Component {
     this.props.setCredentials(payload)
   }
 
-  componentDidUpdate (prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const { onToggle } = this.props
 
     if (prevState.expanded !== this.state.expanded) {
-      if (typeof window.localStorage !== 'undefined') {
+      if (window.localStorage) {
         localStorage.setItem('isChatOpen', this.state.expanded)
         if (onToggle) {
           onToggle(this.state.expanded)
@@ -125,7 +131,9 @@ class App extends Component {
       logoStyle,
       showInfo,
       sendMessagePromise,
+      loadConversationHistoryPromise,
       onClickShowInfo,
+      conversationHistoryId,
       primaryHeader,
       secondaryView,
       secondaryHeader,
@@ -133,22 +141,12 @@ class App extends Component {
       getLastMessage,
       enableHistoryInput,
       defaultMessageDelay,
+      readOnlyMode,
     } = this.props
     const { expanded } = this.state
 
     return (
       <div className='RecastApp CaiApp'>
-        <link
-          rel='stylesheet'
-          type='text/css'
-          href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css'
-        />
-        <link
-          rel='stylesheet'
-          type='text/css'
-          href='https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css'
-        />
-
         <Expander
           show={!expanded}
           onClick={this.toggleChat}
@@ -166,6 +164,7 @@ class App extends Component {
           showInfo={showInfo}
           onClickShowInfo={onClickShowInfo}
           sendMessagePromise={sendMessagePromise}
+          loadConversationHistoryPromise={loadConversationHistoryPromise}
           primaryHeader={primaryHeader}
           secondaryView={secondaryView}
           secondaryHeader={secondaryHeader}
@@ -173,6 +172,9 @@ class App extends Component {
           getLastMessage={getLastMessage}
           enableHistoryInput={enableHistoryInput}
           defaultMessageDelay={defaultMessageDelay}
+          conversationHistoryId={conversationHistoryId}
+          readOnlyMode={readOnlyMode}
+
         />
       </div>
     )
@@ -188,6 +190,8 @@ App.propTypes = {
   containerStyle: PropTypes.object,
   showInfo: PropTypes.bool,
   sendMessagePromise: PropTypes.func,
+  conversationHistoryId: PropTypes.string,
+  loadConversationHistoryPromise: PropTypes.func,
   noCredentials: PropTypes.bool,
   primaryHeader: PropTypes.func,
   secondaryView: PropTypes.bool,
@@ -200,6 +204,7 @@ App.propTypes = {
   onRef: PropTypes.func,
   clearMessagesOnclose: PropTypes.bool,
   enableHistoryInput: PropTypes.bool,
+  readOnlyMode: PropTypes.bool,
   defaultMessageDelay: PropTypes.number,
 }
 
