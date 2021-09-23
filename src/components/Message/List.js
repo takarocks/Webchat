@@ -32,8 +32,8 @@ const _getButtonTitle = (button, buttonTitleMaxLength) => {
 }
 
 const ListElement = ({ title, subtitle, imageUrl, buttons, sendMessage, readOnlyMode, isLastMessage }) => {
-  const titleMaxLength = 25
-  const subTitleMaxLength = 50
+  const titleMaxLength = 100
+  const subTitleMaxLength = 300
   const buttonTitleMaxLength = 20
 
   const button = propOr(null, 0, buttons)

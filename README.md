@@ -1,3 +1,11 @@
+# SAP Conversational AI Webchat - custom202004
+
+## Customizations made on this forked branch
+* **web_url** button.type behavior changed to open web link window on the **same** (`_self`) browser window.
+* **web_url_self** button.type is introduced which works as same as web_url.
+* **web_url_blank** button.type is introduced to open web link window on the **new** (`_blank`) browser window, original web_url behavior.
+* **List** message type characters max length extended. Title is extended to 100 from 25, subtitle extended to 300 from 50.
+
 <div align="center">
   <img src="assets/header.png" />
 </div>

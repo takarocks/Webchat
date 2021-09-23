@@ -38,6 +38,14 @@ const Button = ({ button, sendMessage, readOnlyMode, isLastMessage }) => {
     return null
   }
 
+  if (button.type === 'web_url_self' && sanitizeUrl(value) === 'about:blank') {
+    return null
+  }
+
+  if (button.type === 'web_url_blank' && sanitizeUrl(value) === 'about:blank') {
+    return null
+  }
+
   let content = null
 
   // https://sapjira.wdf.sap.corp/browse/SAPMLCONV-4781 - Support the phonenumber options
@@ -54,12 +62,22 @@ const Button = ({ button, sendMessage, readOnlyMode, isLastMessage }) => {
       </a>
     )
     break
-  case 'web_url':
+  case 'web_url_blank':
     content = (
       <a
         className={linkClassName}
         href={href}
         target={target}
+        rel='noopener noreferrer'>
+        {formattedTitle}
+      </a>
+    )
+    break
+  case 'web_url':
+  case 'web_url_self':
+    content = (
+      <a
+        className='RecastAppButton-Link CaiAppButton-Link' href={value} target='_self'
         rel='noopener noreferrer'>
         {formattedTitle}
       </a>
