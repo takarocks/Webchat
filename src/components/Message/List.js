@@ -32,8 +32,9 @@ const _getButtonTitle = (button, buttonTitleMaxLength) => {
 }
 
 const ListElement = ({ title, subtitle, imageUrl, buttons, sendMessage, readOnlyMode, isLastMessage }) => {
-  const titleMaxLength = 25
-  const subTitleMaxLength = 50
+  // Extending titleMaxLength and subTitleMaxLength
+  const titleMaxLength = 100
+  const subTitleMaxLength = 300
   const buttonTitleMaxLength = 20
 
   const button = propOr(null, 0, buttons)
@@ -54,14 +55,33 @@ const ListElement = ({ title, subtitle, imageUrl, buttons, sendMessage, readOnly
       </a>
     )
     break
+  // Make web_url work on the same window, introduce web_url_self 
   case 'web_url':
+  case 'web_url_self':
     if (sanitizeUrl(button.value) !== 'about:blank') {
       const { href, target } = _getUrlInfo(button, disableButton)
       content = (
         <a
           className={buttonClassName}
           href={href}
-          target={target}
+          target='_self'
+          rel='noopener noreferrer'>
+          {buttonTitle}
+        </a>
+      )
+    } else {
+      content = 'about:blank'
+    }
+    break
+  // web_url_blank
+  case 'web_url_blank':
+    if (sanitizeUrl(button.value) !== 'about:blank') {
+      const { href, target } = _getUrlInfo(button, disableButton)
+      content = (
+        <a
+          className={buttonClassName}
+          href={href}
+          target='_blank'
           rel='noopener noreferrer'>
           {buttonTitle}
         </a>

@@ -37,6 +37,14 @@ const Button = ({ button, sendMessage, readOnlyMode, isLastMessage }) => {
   if (button.type === 'web_url' && sanitizeUrl(value) === 'about:blank') {
     return null
   }
+  // web_url_self
+  if (button.type === 'web_url_self' && sanitizeUrl(value) === 'about:blank') {
+    return null
+  }
+  // web_url_blank
+  if (button.type === 'web_url_blank' && sanitizeUrl(value) === 'about:blank') {
+    return null
+  }
 
   let content = null
 
@@ -54,12 +62,26 @@ const Button = ({ button, sendMessage, readOnlyMode, isLastMessage }) => {
       </a>
     )
     break
+  // Make web_url work on the same window, introduct web_url_self
   case 'web_url':
+  case 'web_url_self':
     content = (
       <a
         className={linkClassName}
         href={href}
-        target={target}
+        target='_self'
+        rel='noopener noreferrer'>
+        {formattedTitle}
+      </a>
+    )
+    break
+  // web_url_blank
+  case 'web_url_blank':
+    content = (
+      <a
+        className={linkClassName}
+        href={href}
+        target='_blank'
         rel='noopener noreferrer'>
         {formattedTitle}
       </a>
