@@ -14,6 +14,7 @@ import {
   removeAllMessages,
   addBotMessage,
   addUserMessage,
+  getTranscript,
 } from 'actions/messages'
 
 import Header from 'components/Header'
@@ -46,6 +47,7 @@ const MAX_NUMBER_WITHOUT_MESSAGES_BEFORE_WAITING = 6
   addUserMessage,
   addBotMessage,
   removeConversationId,
+  getTranscript,
   },
 )
 class Chat extends Component {
@@ -463,6 +465,49 @@ class Chat extends Component {
     this._isPolling = false
   }
 
+  // Transcript action option - getTranscript
+  getTranscript = async () => {
+      // Create transcript data
+      const now = new Date()
+      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+      const strNow = months[now.getMonth()] + ' ' + ("0" + now.getDate()).slice(-2) + ', ' + now.getFullYear() + ' ' + ("0" + now.getHours()).slice(-2) + ':' + ("0" + now.getMinutes()).slice(-2) + ':' + ("0" + now.getSeconds()).slice(-2)
+
+      let transcript = strNow + ' \n\n'
+      const messages = this.props.messages
+
+      for (let i in messages) {
+        const prefix = messages[i].participant.isBot ? '(bot) ' : '(customer) '
+        let body = ''
+
+        const type = messages[i].attachment.type
+        switch(type){
+          case 'text':
+            body = messages[i].attachment.content
+            break
+          case 'list':
+          case 'carousel':
+            const elements = type == 'list' ? messages[i].attachment.content.elements : messages[i].attachment.content;
+            for (let j in elements) {
+              const e = elements[j];
+              body = body + e.title + ' [' + e.subtitle + ']';
+              if (j != elements.length-1) {
+                body = body + ', ';
+              }
+            }
+            break
+        }
+        transcript = transcript + prefix + body + '\n'
+      }
+
+      // Download transcript.txt
+      let blob = new Blob([transcript], { type: 'plain/text', endings: 'native' })
+      let element = document.createElement('a')
+      element.download = 'transcript.txt'
+      element.target = '_blank'
+      element.href = window.URL.createObjectURL(blob)
+      element.click()
+  }
+
   render () {
     const {
       closeWebchat,
@@ -479,6 +524,7 @@ class Chat extends Component {
       show,
       enableHistoryInput,
       readOnlyMode,
+      getTranscript,
     } = this.props
     const { showSlogan, messages, inputHeight } = this.state
 
@@ -498,6 +544,7 @@ class Chat extends Component {
             key='header'
             logoStyle={logoStyle}
             readOnlyMode={readOnlyMode}
+            getTranscript={getTranscript}
           />
         )}
         <div
@@ -572,6 +619,7 @@ Chat.propTypes = {
   enableHistoryInput: PropTypes.bool,
   readOnlyMode: PropTypes.bool,
   defaultMessageDelay: PropTypes.number,
+  getTranscript: PropTypes.func,
 }
 
 export default Chat

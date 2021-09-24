@@ -3,7 +3,8 @@ import PropTypes from 'prop-types'
 
 import './style.scss'
 
-const Header = ({ closeWebchat, preferences, logoStyle, readOnlyMode }) => {
+// Transcript action option - getTranscript
+const Header = ({ closeWebchat, preferences, logoStyle, readOnlyMode, getTranscript }) => {
   if (readOnlyMode) {
     return null
   }
@@ -19,6 +20,8 @@ const Header = ({ closeWebchat, preferences, logoStyle, readOnlyMode }) => {
 
       <div className='RecastAppHeader--title CaiAppHeader--title'>{preferences.headerTitle}</div>
 
+      <div className="RecastAppHeader--action" onClick={getTranscript}>Transcript</div>
+
       <div className='RecastAppHeader--btn CaiAppHeader--btn' onClick={closeWebchat}>
         <img src='https://cdn.cai.tools.sap/webchat/close.svg' />
       </div>
@@ -31,6 +34,7 @@ Header.propTypes = {
   preferences: PropTypes.object,
   logoStyle: PropTypes.object,
   readOnlyMode: PropTypes.bool,
+  getTranscript: PropTypes.func,
 }
 
 export default Header

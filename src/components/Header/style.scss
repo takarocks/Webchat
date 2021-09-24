@@ -20,6 +20,15 @@
     width: 15px;
     height: 15px;
   }
+
+  // getTranscript - Style for action in header
+  &--action {
+   cursor: pointer;
+   padding: 3px 5px;
+   border: solid 2px;
+   border-radius: 5px;
+   margin-left: 5px;
+ }
 }
 
 @media only screen and (min-width: 420px) and (min-height: 575px) {
